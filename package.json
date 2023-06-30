@@ -2,7 +2,6 @@
   "name": "cow-protocol-analysis",
   "version": "1.0.0",
   "description": "An analysis of CoW Protocol",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx ts-node index.ts"
@@ -16,7 +15,10 @@
   "license": "ISC",
   "dependencies": {
     "@types/node": "^20.2.5",
+    "axios": "^1.4.0",
     "bignumber.js": "^9.1.1",
+    "commander": "^10.0.1",
+    "dotenv": "^16.3.1",
     "ethers": "5.7.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3",

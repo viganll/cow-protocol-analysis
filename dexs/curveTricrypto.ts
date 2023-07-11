@@ -8,7 +8,6 @@ export class CurveTricrypto extends DeX {
   private contract: Contract;
 
   constructor() {
-    //@ts-ignore
     super(CURVE_TRICRYPTO_ABI);
     this.contract = new Contract(CURVE_TRICRYPTO_ADDRESS, CURVE_TRICRYPTO_ABI, provider);
   }

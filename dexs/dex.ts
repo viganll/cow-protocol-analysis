@@ -1,8 +1,8 @@
 import { BigNumber, Contract, providers, utils } from "ethers";
 import { provider } from "../";
-import { BALANCER_ABI, CURVE_ABI, UNISWAP_V2_ABI, UNISWAP_V3_ABI } from "../abis";
+import { BALANCER_ABI, CURVE_ABI, CURVE_TRICRYPTO_ABI, DODO_ABI, UNISWAP_V2_ABI, UNISWAP_V3_ABI } from "../abis";
 
-export type Abi = typeof UNISWAP_V2_ABI | typeof BALANCER_ABI | typeof UNISWAP_V3_ABI | typeof CURVE_ABI;
+export type Abi = typeof UNISWAP_V2_ABI | typeof BALANCER_ABI | typeof UNISWAP_V3_ABI | typeof CURVE_ABI | typeof DODO_ABI | typeof CURVE_TRICRYPTO_ABI;
 
 interface DeXInterface {
   getAmountsIn(log: providers.Log): Promise<{

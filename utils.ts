@@ -6,6 +6,8 @@ import {
   COW_PROTOCOL_ADDRESS,
   COW_PROTOCOL_SETTLEMENT_EVENT,
   CURVE_SWAP_EVENT,
+  CURVE_TRICRYPTO_EVENT,
+  DODO_SWAP_EVENT,
   MAVERICK_SWAP_EVENT,
   PANCAKE_V2_FACTORY_ADDRESS,
   PANCAKE_V2_SWAP_EVENT,
@@ -17,6 +19,8 @@ import {
 } from "./const";
 import { Balancer } from "./dexs/balancer";
 import { Curve } from "./dexs/curve";
+import { CurveTricrypto } from "./dexs/curveTricrypto";
+import { Dodo } from "./dexs/dodo";
 import { PancakeV2 } from "./dexs/pancakeV2";
 import { Sushiswap } from "./dexs/sushiswap";
 import { UniswapV2 } from "./dexs/uniswapV2";
@@ -30,6 +34,10 @@ export async function getDex(functionSelector: string, address: string) {
       return new Balancer();
     case CURVE_SWAP_EVENT:
       return new Curve();
+    case CURVE_TRICRYPTO_EVENT:
+      return new CurveTricrypto();
+    case DODO_SWAP_EVENT:
+      return new Dodo();
     case UNISWAP_V2_SWAP_EVENT:
     case SUSHISWAP_SWAP_EVENT:
     case PANCAKE_V2_SWAP_EVENT:

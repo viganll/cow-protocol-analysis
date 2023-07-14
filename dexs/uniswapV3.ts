@@ -1,4 +1,4 @@
-import { Contract, providers } from "ethers";
+import { BigNumber, Contract, providers } from "ethers";
 import { provider } from "../.";
 import { UNISWAP_V3_ABI } from "../abis";
 import { DeX } from "./dex";
@@ -28,8 +28,8 @@ export class UniswapV3 extends DeX {
     const token1 = await contract.token1();
 
     return amount0 > 0
-      ? { tokenIn: token0, amountIn: amount0, tokenOut: token1, amountOut: amount1 }
-      : { tokenIn: token1, amountIn: amount1, tokenOut: token0, amountOut: amount0 };
+      ? { tokenIn: token0, amountIn: amount0, tokenOut: token1, amountOut: BigNumber.from(amount1).mul(-1) }
+      : { tokenIn: token1, amountIn: amount1, tokenOut: token0, amountOut: BigNumber.from(amount0).mul(-1) };
   }
 
   public getName() {

@@ -4,6 +4,8 @@ export const COW_PROTOCOL_TRADE_EVENT = utils.id("Trade(address,address,address,
 
 export const COW_PROTOCOL_SETTLEMENT_EVENT = utils.id("Settlement(address)");
 
+export const COW_PROTOCOL_INTERACTION_EVENT = utils.id("Interaction(address,uint256,bytes4)");
+
 export const UNISWAP_V2_SWAP_EVENT = utils.id("Swap(address,uint256,uint256,uint256,uint256,address)");
 
 export const UNISWAP_V3_SWAP_EVENT = utils.id("Swap(address,address,int256,int256,uint160,uint128,int24)");

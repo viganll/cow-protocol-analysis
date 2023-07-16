@@ -2554,6 +2554,14 @@ export const PRICES = [
   {
     minute: "2023-07-14 10:00:00.000 UTC",
     blockchain: "ethereum",
+    contract_address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    decimals: 18,
+    symbol: "ETH",
+    price: 1999.64,
+  },
+  {
+    minute: "2023-07-14 10:00:00.000 UTC",
+    blockchain: "ethereum",
     contract_address: "0x0d438f3b5175bebc262bf23753c1e53d03432bde",
     decimals: 18,
     symbol: "wNXM",

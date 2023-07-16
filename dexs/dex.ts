@@ -61,7 +61,7 @@ export abstract class DeX implements DeXInterface {
     const token0 = await contract.token0();
     const token1 = await contract.token1();
 
-    return amount0In > 0
+    return amount0In > amount1In
       ? {
           tokenIn: token0,
           amountIn: amount0In,

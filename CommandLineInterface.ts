@@ -55,7 +55,10 @@ class CommandLineInterface {
       .command("get-submission-duration <startBlock> <endBlock>")
       .description("It calculates the time it took a order to be submitted")
       .action(async (startBlock, endBlock) => {
-        await cowProtocolService.getOrderSubmissionDurationWithBlockRange(parseInt(startBlock), parseInt(endBlock));
+        const start = parseInt(startBlock);
+        const end = parseInt(endBlock);
+        const ordersDuration = await cowProtocolService.getOrderSubmissionDurationWithBlockRange(start, end);
+        writeJSONFile(`orders_duration/${start}_${end}.json`, ordersDuration);
       });
 
     program

@@ -4,6 +4,7 @@ import moment from "moment";
 import { provider } from ".";
 import { COW_PROTOCOL_TRADE_EVENT } from "./const";
 import { cowProtocol } from "./dexs/cowProtocol";
+import { OrderDuration } from "./types";
 import { getCoWProtocolSettelements } from "./utils";
 import { logger } from "./winstonLogger";
 
@@ -94,13 +95,22 @@ class CoWProtocolService {
 
   getOrderSubmissionDurationWithBlockRange = async (fromBlock: number, endBlock: number) => {
     const cowTransactions = await getCoWProtocolSettelements(fromBlock, endBlock);
+    let ordersDurationData: OrderDuration[] = [];
+
     for (const cowTx of cowTransactions) {
-      await this.getOrderSubmissionDuration(cowTx);
+      try {
+        ordersDurationData = [...ordersDurationData, ...(await this.getOrderSubmissionDuration(cowTx))];
+      } catch (err) {
+        //Silent err
+      }
     }
+    return ordersDurationData;
   };
 
-  getOrderSubmissionDuration = async (tx: string) => {
+  getOrderSubmissionDuration = async (tx: string): Promise<OrderDuration[]> => {
     logger.info(`[CoW Protocol] Getting order submission duration for ${tx}`);
+
+    let ordersDurationData: OrderDuration[] = [];
 
     try {
       const transaction = await provider.getTransactionReceipt(tx);
@@ -115,12 +125,21 @@ class CoWProtocolService {
 
         logger.info(`[CoW Protocol] Order ${orderId} submitted at ${order.creationDate} and mined at ${blockMinedAt}. Duration`);
 
-        logger.info(moment(blockMinedAt).toString());
-        logger.info(moment(order.creationDate).toString());
-        logger.info(moment(blockMinedAt).diff(moment(order.creationDate), "seconds"));
+        const orderDurationData = {
+          orderId,
+          minedAt: moment(blockMinedAt).toString(),
+          submitedAt: moment(order.creationDate).toString(),
+          duration: moment(blockMinedAt).diff(moment(order.creationDate), "seconds"),
+          blockNumber: log.blockNumber,
+        };
+
+        ordersDurationData.push(orderDurationData);
       }
+
+      return ordersDurationData;
     } catch (err) {
       logger.error(`Error occurred while getting the order submission duration of ${tx}: ${err}`);
+      throw err;
     }
   };
 }

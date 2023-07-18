@@ -42,4 +42,5 @@ export interface OrderDuration {
   duration: number;
   submitedAt: string;
   minedAt: string;
+  blockNumber: number;
 }

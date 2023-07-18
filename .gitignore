@@ -1,5 +1,5 @@
 node_modules
 .env
-flashbots_data
+batches_in_bundles
 cow_batches
 log

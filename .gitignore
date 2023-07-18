@@ -1,2 +1,5 @@
 node_modules
 .env
+flashbots_data
+cow_batches
+log

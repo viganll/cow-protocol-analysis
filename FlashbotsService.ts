@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { BatchInBundle } from "./types";
 import { getCoWProtocolSettelementsWithTx } from "./utils";
 import { logger } from "./winstonLogger";
 
@@ -45,71 +46,81 @@ class FlashbotsBlockService {
   getBatchesSubmittedViaFlashbots = async (fromBlock: number, endBlock: number) => {
     try {
       const cowSettelments = await getCoWProtocolSettelementsWithTx(fromBlock, endBlock);
+      const flashbotsBlocks = await flashbotsBlockService.getFlashbotsBlocks(fromBlock, endBlock);
 
-      let includedInBundle = 0;
-      let cowSettelmentCount = 0;
+      let numberOfBatches = 0;
+      let numberOfBatchesIncludedInBundles = 0;
+      let batchesInBundles: BatchInBundle[] = [];
 
       for await (const cowSettelment of cowSettelments) {
-        cowSettelmentCount++;
+        numberOfBatches++;
         try {
           if (cowSettelment.blockNumber) {
-            const flashbotsBlocks = await flashbotsBlockService.getFlashbotsBundles(cowSettelment.blockNumber);
-            if (flashbotsBlocks.length === 0) {
+            const flashbotsBundles = flashbotsBlockService.getFlashbotsBundles(flashbotsBlocks, cowSettelment.blockNumber);
+            if (flashbotsBundles.length === 0) {
               continue;
             }
 
-            for (const flashbotBundle of flashbotsBlocks[0]) {
+            for (const flashbotBundle of flashbotsBundles[0]) {
               if (flashbotBundle.includes(cowSettelment.hash)) {
-                logger.info(`Bundle contains batch ${cowSettelment.hash}. Solver address is: ${cowSettelment.from}`);
-                if (flashbotBundle.length === 1) {
-                  includedInBundle++;
-                  logger.info("Bundle contains only the batch");
-                }
+                batchesInBundles.push({
+                  blockNumber: cowSettelment.blockNumber,
+                  numberOfTransactions: flashbotBundle.length,
+                  solverAddress: cowSettelment.from,
+                  batchIndex: flashbotBundle?.indexOf(cowSettelment.hash) ?? -1,
+                });
+                logger.info(`Bundle contains batch ${cowSettelment.hash}. Solver address: ${cowSettelment.from}. Block number: ${cowSettelment.blockNumber}`);
+                numberOfBatchesIncludedInBundles++;
+
+                if (flashbotBundle.length === 1) logger.info("Bundle contains only the batch");
               }
             }
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          } else {
-            logger.info("No block number");
           }
         } catch (err) {
           logger.error(`Error occurred while checking whether the batch was submitted via CoW Protocol for tx ${cowSettelment.hash}: ${err}`);
         }
       }
 
-      logger.info(`Number of bundles included: ${(includedInBundle / cowSettelmentCount).toFixed(2)}`);
+      logger.info(
+        `Total batches: ${numberOfBatches}. Number of batches included in bundles: ${numberOfBatchesIncludedInBundles}. Percentage :${(
+          numberOfBatchesIncludedInBundles / numberOfBatches
+        ).toFixed(2)}`
+      );
+
+      return batchesInBundles;
     } catch (err) {
-      logger.error(`Error occurred in getCoWProtocolSettelements: ${err}`);
+      logger.error(`Error occurred in getBatchesSubmittedViaFlashbots: ${err}`);
+      throw err;
     }
   };
 
-  getFlashbotsBlocks = async (blockNumber: number) => {
+  /*
+    @endBlock - is inclusive
+  */
+  getFlashbotsBlocks = async (startBlock: number, endBlock: number) => {
     try {
-      const response = await this.axios.get(`blocks?block_number=${blockNumber}`);
+      const limit = Math.min(endBlock - startBlock + 1, 100);
+      const response = await this.axios.get(`blocks?before=${endBlock + 1}&limit=${limit}`);
       return response.data.blocks as FlashbotsBlock[];
     } catch (err) {
+      logger.error(err);
       throw err;
     }
   };
 
-  getFlashbotsBundles = async (blockNumber: number) => {
-    try {
-      const blocks = await this.getFlashbotsBlocks(blockNumber);
-
-      function getSubBundles(transactions: FlashbotsTransaction[]) {
-        return transactions.reduce((acc: string[][], flashbotTransaction: FlashbotsTransaction) => {
-          if (acc[flashbotTransaction.bundle_index]) {
-            acc[flashbotTransaction.bundle_index].push(flashbotTransaction.transaction_hash);
-          } else {
-            acc[flashbotTransaction.bundle_index] = [flashbotTransaction.transaction_hash];
-          }
-          return acc;
-        }, []);
-      }
-
-      return blocks.map((block) => getSubBundles(block.transactions));
-    } catch (err) {
-      throw err;
+  getFlashbotsBundles = (flashbotsBlocks: FlashbotsBlock[], blockNumber: number) => {
+    function getSubBundles(transactions: FlashbotsTransaction[]) {
+      return transactions.reduce((acc: string[][], flashbotTransaction: FlashbotsTransaction) => {
+        if (acc[flashbotTransaction.bundle_index]) {
+          acc[flashbotTransaction.bundle_index].push(flashbotTransaction.transaction_hash);
+        } else {
+          acc[flashbotTransaction.bundle_index] = [flashbotTransaction.transaction_hash];
+        }
+        return acc;
+      }, []);
     }
+
+    return flashbotsBlocks.filter((fb) => fb.block_number === blockNumber).map((block) => getSubBundles(block.transactions));
   };
 }
 

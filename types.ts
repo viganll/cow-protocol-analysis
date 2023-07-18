@@ -8,7 +8,7 @@ export interface CoWBatch {
   cowValueInUsd: number;
   blockNumber: number;
   timestamp: string;
-  noInteraction?: boolean;
+  noInteraction: boolean;
   tokensOut: TokenOut[];
 }
 

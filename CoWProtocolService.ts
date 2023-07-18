@@ -1,4 +1,6 @@
+import { SubgraphApi, SupportedChainId } from "@cowprotocol/cow-sdk";
 import axios, { AxiosInstance } from "axios";
+import moment from "moment";
 import { provider } from ".";
 import { COW_PROTOCOL_TRADE_EVENT } from "./const";
 import { cowProtocol } from "./dexs/cowProtocol";
@@ -38,15 +40,48 @@ interface Order {
   executedSurplusFee: string;
 }
 
+interface GraphQLOrderResponse {
+  order: {
+    trades: [
+      {
+        sellAmountUsd: string;
+        buyAmountUsd: string;
+        buyAmount: string;
+        sellAmount: string;
+      }
+    ];
+  };
+}
+
 class CoWProtocolService {
   private axios: AxiosInstance;
   baseURL = "https://api.cow.fi/mainnet/api/v1/";
+  private subgraphApi: SubgraphApi;
 
   constructor() {
+    this.subgraphApi = new SubgraphApi({ chainId: SupportedChainId.MAINNET });
     this.axios = axios.create({
       baseURL: this.baseURL,
     });
   }
+
+  //@depreacated
+  getOrderPrice = async (id: string) => {
+    const query = `query GetOrder($id: ID!) {
+      order(id: $id) {
+        trades {
+          buyAmount
+          buyAmountUsd
+          sellAmount
+          sellAmountUsd
+        }
+      }
+    }`;
+    const variables = { id };
+    const { order } = await this.subgraphApi.runQuery<GraphQLOrderResponse>(query, variables);
+    const { sellAmountUsd, buyAmountUsd } = order.trades[0];
+    return { sellAmountUsd, buyAmountUsd };
+  };
 
   getOrder = async (orderId: string) => {
     try {
@@ -77,7 +112,12 @@ class CoWProtocolService {
         const block = await provider.getBlock(transaction.blockNumber);
         var blockMinedAt = new Date(0); // The 0 there is the key, which sets the date to the epoch
         blockMinedAt.setUTCSeconds(block.timestamp);
+
         logger.info(`[CoW Protocol] Order ${orderId} submitted at ${order.creationDate} and mined at ${blockMinedAt}. Duration`);
+
+        logger.info(moment(blockMinedAt).toString());
+        logger.info(moment(order.creationDate).toString());
+        logger.info(moment(blockMinedAt).diff(moment(order.creationDate), "seconds"));
       }
     } catch (err) {
       logger.error(`Error occurred while getting the order submission duration of ${tx}: ${err}`);

@@ -3,6 +3,7 @@ import { cowProtocolService } from "./CoWProtocolService";
 import { flashbotsBlockService } from "./FlashbotsService";
 import { liquidityCalculator } from "./LiquidityCalculator";
 import { priceService } from "./PriceService";
+import { PARTITION_SIZE } from "./const";
 import { getCoWProtocolSettelementsWithTx, partitionRange, writeJSONFile } from "./utils";
 const program = new Command();
 
@@ -20,7 +21,7 @@ class CommandLineInterface {
       .command("calculate-cow <startBlock> <endBlock>")
       .description("It calculates internal liquidity of CoW Protocol from startBlock to endBlock")
       .action(async (startBlock, endBlock) => {
-        const partitions = partitionRange(parseInt(startBlock), parseInt(endBlock), 10000);
+        const partitions = partitionRange(parseInt(startBlock), parseInt(endBlock), PARTITION_SIZE);
 
         for await (const { start, end } of partitions) {
           const cowBatches = await liquidityCalculator.getInternalLiquidityOfCoWProtocol(start, end);
@@ -39,7 +40,7 @@ class CommandLineInterface {
       .command("calculate-cow-uniswap <startBlock> <endBlock>")
       .description("It calculates internal liquidity of Uniswap V2 from startBlock to endBlock")
       .action(async (startBlock, endBlock) => {
-        const partitions = partitionRange(parseInt(startBlock), parseInt(endBlock), 1000);
+        const partitions = partitionRange(parseInt(startBlock), parseInt(endBlock), PARTITION_SIZE);
 
         for await (const { start, end } of partitions) {
           try {

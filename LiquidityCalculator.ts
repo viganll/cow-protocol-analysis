@@ -1,9 +1,8 @@
 import BigNumber from "bignumber.js";
 import { BigNumber as BigNumberE, providers } from "ethers";
 import { provider } from ".";
-import { COW_PROTOCOL_INTERACTION_EVENT, COW_PROTOCOL_TRADE_EVENT, UNISWAP_V2_SWAP_EVENT } from "./const";
+import { COW_PROTOCOL_INTERACTION_EVENT, COW_PROTOCOL_TRADE_EVENT, UNISWAP_V3_SWAP_EVENT } from "./const";
 import { cowProtocol } from "./dexs/cowProtocol";
-import { UniswapV2 } from "./dexs/uniswapV2";
 import { UniswapV3 } from "./dexs/uniswapV3";
 import { CoWBatch, CoWBlock, TokenOut } from "./types";
 import { buildCoWBatch, buildCoWBlock, buildTokenOut, getCoWProtocolSettelements, getDex, getUniswapLogs, groupByProperty, minMax } from "./utils";
@@ -84,8 +83,8 @@ class LiquidityCalculator {
 
         for await (const log of logs) {
           const logFunctionSelector = log.topics[0];
-          // if (logFunctionSelector !== UNISWAP_V2_SWAP_EVENT && logFunctionSelector !== UNISWAP_V3_SWAP_EVENT) continue;
-          const uniswapDeX = logFunctionSelector === UNISWAP_V2_SWAP_EVENT ? new UniswapV2() : new UniswapV3();
+          if (logFunctionSelector !== UNISWAP_V3_SWAP_EVENT) continue;
+          const uniswapDeX = new UniswapV3();
 
           const { tokenIn, amountIn, tokenOut, amountOut } = await uniswapDeX.getSwapAmounts(log);
 
@@ -109,13 +108,13 @@ class LiquidityCalculator {
           const tokenBuild = buildTokenOut({ token: tokenOut, cowScore: maxCowScore, totalAmount: _amountOut, maxCowScore });
           tokensOut.push(tokenBuild);
 
-          logger.info(`[Uniswap V2] Internal Liquidity is ${maxCowScore.toFixed(2)} for token ${tokenOut}`);
+          logger.info(`[Uniswap] Internal Liquidity is ${maxCowScore.toFixed(2)} for token ${tokenOut}`);
         });
 
         cowBlocks.push(buildCoWBlock({ timestamp, blockNumber, tokensOut }));
       }
     } catch (err) {
-      logger.error(`Error while calculating internal liqudity: ${err}`);
+      logger.error(`[Uniswap] Error while calculating internal liqudity: ${err}`);
       throw err;
     }
     return cowBlocks;

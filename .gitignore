@@ -3,3 +3,7 @@ node_modules
 batches_in_bundles
 cow_batches
 log
+cow_blocks
+data-analysis/__pycache__
+data-analysis/.idea
+.DS_Store

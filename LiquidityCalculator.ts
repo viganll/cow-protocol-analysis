@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
 import { BigNumber as BigNumberE, providers } from "ethers";
 import { provider } from ".";
-import { COW_PROTOCOL_INTERACTION_EVENT, COW_PROTOCOL_TRADE_EVENT, UNISWAP_V3_SWAP_EVENT } from "./const";
+import { COW_PROTOCOL_INTERACTION_EVENT, COW_PROTOCOL_TRADE_EVENT, ETH_ADDRESS, UNISWAP_V3_SWAP_EVENT, WETH_ADDRESS } from "./const";
 import { cowProtocol } from "./dexs/cowProtocol";
 import { UniswapV3 } from "./dexs/uniswapV3";
 import { CoWBatch, CoWBlock, TokenOut } from "./types";
@@ -144,8 +144,12 @@ class LiquidityCalculator {
     for (const log of transaction.logs) {
       if (log.topics[0] === COW_PROTOCOL_INTERACTION_EVENT) noInteraction = false;
       if (log.topics[0] !== COW_PROTOCOL_TRADE_EVENT) continue;
-      const { amountIn, tokenIn, amountOut, tokenOut } = cowProtocol.getSwapAmounts(log);
+      let { amountIn, tokenIn, amountOut, tokenOut } = cowProtocol.getSwapAmounts(log);
       numberOfTrades++;
+
+      // ETH and WETH should be treated the same
+      tokenIn = tokenIn === ETH_ADDRESS ? WETH_ADDRESS : tokenIn;
+      tokenOut = tokenOut === ETH_ADDRESS ? WETH_ADDRESS : tokenOut;
 
       const currentAmountIn = totalAmountInByToken.get(tokenIn);
       const currentAmountOut = totalAmountOutByToken.get(tokenOut);

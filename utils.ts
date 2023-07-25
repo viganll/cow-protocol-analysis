@@ -168,7 +168,7 @@ export function buildCoWBatch({
     blockNumber,
     cowValueInUsd,
     batchValueInUsd,
-    noInteraction: noInteraction && cowScore === 0,
+    noInteraction,
     timestamp: formatDate(timestamp),
     tokensOut,
   };

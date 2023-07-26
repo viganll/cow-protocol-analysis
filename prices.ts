@@ -408,6 +408,14 @@ export const MANUAL_PRICES = [
     symbol: "STABLZ",
     price: 0.0057,
   },
+  {
+    minute: "2023-07-14 10:00:00.000 UTC",
+    blockchain: "ethereum",
+    contract_address: "0xd3e4ba569045546d09cf021ecc5dfe42b1d7f6e4",
+    decimals: 18,
+    symbol: "MNW",
+    price: 1,
+  },
 ];
 
 export const PRICES = [

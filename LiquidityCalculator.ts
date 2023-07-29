@@ -76,6 +76,8 @@ class LiquidityCalculator {
       const logsByBlock = groupByProperty(logs, "blockNumber");
 
       for await (const [block, logs] of Object.entries(logsByBlock)) {
+        logger.info(`[Uniswap] Calculating internal liqudity for block ${block}`);
+
         const totalAmountInByToken = new Map<string, BigNumberE>();
         const totalAmountOutByToken = new Map<string, BigNumberE>();
         const blockNumber = Number(block);

@@ -24,6 +24,8 @@ export const PANCAKE_V2_SWAP_EVENT = utils.id("Swap(address,uint256,uint256,uint
 
 export const DODO_SWAP_EVENT = utils.id("DODOSwap(address,address,uint256,uint256,address,address)");
 
+export const DX_SWAP_EVENT = utils.id("Swap(address,uint256,uint256,uint256,uint256,address)");
+
 export const COW_PROTOCOL_ADDRESS = "0x9008D19f58AAbD9eD0D60971565AA8510560ab41";
 
 export const UNISWAP_V2_FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
@@ -31,6 +33,8 @@ export const UNISWAP_V2_FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc
 export const SUSHISWAP_V2_FACTORY_ADDRESS = "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac";
 
 export const PANCAKE_V2_FACTORY_ADDRESS = "0x1097053Fd2ea711dad45caCcc45EfF7548fCB362";
+
+export const DX_SWAP_FACTORY_ADDRESS = "0xd34971BaB6E5E356fd250715F5dE0492BB070452";
 
 export const CURVE_TRICRYPTO_ADDRESS = "0x7f86bf177dd4f3494b841a37e810a34dd56c829b";
 

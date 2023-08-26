@@ -12,6 +12,8 @@ import {
   CURVE_SWAP_EVENT,
   CURVE_TRICRYPTO_EVENT,
   DODO_SWAP_EVENT,
+  DX_SWAP_EVENT,
+  DX_SWAP_FACTORY_ADDRESS,
   MAVERICK_SWAP_EVENT,
   PANCAKE_V2_FACTORY_ADDRESS,
   PANCAKE_V2_SWAP_EVENT,
@@ -25,6 +27,7 @@ import { Balancer } from "./dexs/balancer";
 import { Curve } from "./dexs/curve";
 import { CurveTricrypto } from "./dexs/curveTricrypto";
 import { Dodo } from "./dexs/dodo";
+import { DXswap } from "./dexs/dxSwap";
 import { PancakeV2 } from "./dexs/pancakeV2";
 import { Sushiswap } from "./dexs/sushiswap";
 import { UniswapV2 } from "./dexs/uniswapV2";
@@ -46,6 +49,7 @@ export async function getDex(functionSelector: string, address: string) {
     case UNISWAP_V2_SWAP_EVENT:
     case SUSHISWAP_SWAP_EVENT:
     case PANCAKE_V2_SWAP_EVENT:
+    case DX_SWAP_EVENT:
       const contract = new Contract(address, UNISWAP_V2_ABI, provider);
       const factoryAddress = await contract.factory();
 
@@ -55,6 +59,8 @@ export async function getDex(functionSelector: string, address: string) {
         return new Sushiswap();
       } else if (factoryAddress === PANCAKE_V2_FACTORY_ADDRESS) {
         return new PancakeV2();
+      } else if (factoryAddress === DX_SWAP_FACTORY_ADDRESS) {
+        return new DXswap();
       }
 
       return "NOT_SUPPORTED";

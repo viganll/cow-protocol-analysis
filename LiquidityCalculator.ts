@@ -146,7 +146,8 @@ class LiquidityCalculator {
     for (const log of transaction.logs) {
       if (log.topics[0] === COW_PROTOCOL_INTERACTION_EVENT) noInteraction = false;
       if (log.topics[0] !== COW_PROTOCOL_TRADE_EVENT) continue;
-      let { amountIn, tokenIn, amountOut, tokenOut } = cowProtocol.getSwapAmounts(log);
+      let { amountIn, tokenIn, amountOut, tokenOut, feeAmount } = cowProtocol.getSwapAmounts(log);
+      const amountInWithoutFee = amountIn.sub(feeAmount);
       numberOfTrades++;
 
       // ETH and WETH should be treated the same
@@ -156,7 +157,7 @@ class LiquidityCalculator {
       const currentAmountIn = totalAmountInByToken.get(tokenIn);
       const currentAmountOut = totalAmountOutByToken.get(tokenOut);
 
-      currentAmountIn ? totalAmountInByToken.set(tokenIn, currentAmountIn.add(amountIn)) : totalAmountInByToken.set(tokenIn, amountIn);
+      currentAmountIn ? totalAmountInByToken.set(tokenIn, currentAmountIn.add(amountInWithoutFee)) : totalAmountInByToken.set(tokenIn, amountInWithoutFee);
       currentAmountOut ? totalAmountOutByToken.set(tokenOut, currentAmountOut.add(amountOut)) : totalAmountOutByToken.set(tokenOut, amountOut);
     }
 

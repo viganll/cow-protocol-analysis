@@ -21,13 +21,14 @@ class CoWProtocol extends DeX {
     //@ts-ignore
     const logDescription = this.parseLog(log);
 
-    const { sellToken, buyToken, sellAmount, buyAmount } = logDescription.args;
+    const { sellToken, buyToken, sellAmount, buyAmount, feeAmount } = logDescription.args;
 
     return {
       amountIn: sellAmount,
       tokenIn: sellToken,
       amountOut: buyAmount,
       tokenOut: buyToken,
+      feeAmount: feeAmount,
     };
   }
 
